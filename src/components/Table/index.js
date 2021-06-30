@@ -6,6 +6,8 @@ import { ReactComponent as QuoteIcon } from '../../assets/icons/quoteIcon.svg';
 import { ReactComponent as EditIcon } from '../../assets/icons/editIcon.svg';
 import { ReactComponent as DeleteIcon } from '../../assets/icons/deleteIcon.svg';
 import { ReactComponent as ArchiveIcon } from '../../assets/icons/archiveIcon.svg';
+import { useDispatch } from 'react-redux';
+import { archiveNote, deleteNote, setEditNote } from '../../redux/notesSlice';
 
 export const getCategoryIcon = (category) => {
   switch (category) {
@@ -23,20 +25,37 @@ export const getCategoryIcon = (category) => {
   }
 };
 
-const Table = ({ data }) => {
-  console.log('data', data);
+const Table = ({ data, setIsShowingAddNewNote, setModalTitle }) => {
+  const dispatch = useDispatch();
+
+  const onEditClick = (id) => {
+    dispatch(setEditNote(id));
+    setModalTitle('Edit Note');
+    setIsShowingAddNewNote(true);
+  };
+
   const editButtonElement = (id) => (
-    <button data-id={id} id="edit-button">
+    <button data-id={id} id="edit-button" onClick={() => onEditClick(id)}>
       <EditIcon />
     </button>
   );
+
   const archiveButtonElement = (id) => (
-    <button data-id={id} id="archive-button">
+    <button
+      data-id={id}
+      id="archive-button"
+      onClick={() => dispatch(archiveNote(id))}
+    >
       <ArchiveIcon />
     </button>
   );
+
   const deleteButtonElement = (id) => (
-    <button data-id={id} id="delete-button">
+    <button
+      data-id={id}
+      id="delete-button"
+      onClick={() => dispatch(deleteNote(id))}
+    >
       <DeleteIcon />
     </button>
   );
@@ -57,8 +76,8 @@ const Table = ({ data }) => {
     <table id="notes-table">
       <thead className="table-header">
         <tr>
-          <Header columns={data.columns} />
-          {/* <th id="table-category-icon"></th>
+          {/* <Header columns={data.columns} /> */}
+          <th id="table-category-icon"></th>
           <th id="table-name">Name</th>
           <th id="table-created">Created</th>
           <th id="table-category">Category</th>
@@ -90,29 +109,31 @@ const Table = ({ data }) => {
                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
               </svg>
             </button>
-          </th> */}
+          </th>
         </tr>
       </thead>
       <tbody id="notes-list">
         {data &&
-          data.rows.map((note, index) => {
-            return (
-              <tr key={index}>
-                <td id="table-category-icon">
-                  <span>{getCategoryIcon(note.category)}</span>
-                </td>
-                <td id="table-name">{note.name}</td>
-                <td id="table-created">{note.created}</td>
-                <td id="table-category">{note.category}</td>
-                <td id="table-content">{note.content}</td>
-                <td id="table-dates">{note.dates}</td>
-                <td id="table-action-buttons">
-                  {editButtonElement(note.id)} {archiveButtonElement(note.id)}
-                  {deleteButtonElement(note.id)}
-                </td>
-              </tr>
-            );
-          })}
+          data.rows
+            .filter((note) => !note.archived)
+            .map((note, index) => {
+              return (
+                <tr key={index}>
+                  <td id="table-category-icon">
+                    <span>{getCategoryIcon(note.category)}</span>
+                  </td>
+                  <td id="table-name">{note.name}</td>
+                  <td id="table-created">{note.created}</td>
+                  <td id="table-category">{note.category}</td>
+                  <td id="table-content">{note.content}</td>
+                  <td id="table-dates">{note.dates}</td>
+                  <td id="table-action-buttons">
+                    {editButtonElement(note.id)} {archiveButtonElement(note.id)}
+                    {deleteButtonElement(note.id)}
+                  </td>
+                </tr>
+              );
+            })}
       </tbody>
     </table>
   );

@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
   const [isShowingAddNewNote, setIsShowingAddNewNote] = useState(false);
+  const [modalTitle, setModalTitle] = useState('Add New Note');
   const dispatch = useDispatch();
 
   const notesState = useSelector(selectNotes);
@@ -21,7 +22,13 @@ function App() {
 
   return (
     <div className="container">
-      {notesState.rows && notesState.rows.length && <Table data={notesState} />}
+      {notesState.rows && (
+        <Table
+          data={notesState}
+          setIsShowingAddNewNote={setIsShowingAddNewNote}
+          setModalTitle={setModalTitle}
+        />
+      )}
       <div className="row-end">
         <button id="create-note" onClick={() => setIsShowingAddNewNote(true)}>
           Create Note
@@ -30,7 +37,7 @@ function App() {
       {/* <Table /> */}
       {isShowingAddNewNote && (
         <Modal setIsShowingAddNewNote={setIsShowingAddNewNote}>
-          <NewNoteForm />
+          <NewNoteForm title={modalTitle} />
         </Modal>
       )}
     </div>

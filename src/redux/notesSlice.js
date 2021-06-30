@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { uuidv4 } from '../notes';
-import { notes } from '../notes';
 
 const initialState = {};
 const getDatesTextFromContent = (contentText) => {
@@ -39,11 +38,61 @@ export const notesSlice = createSlice({
         archived: false,
       });
     },
+    deleteNote: (state, action) => {
+      Object.assign(state, {
+        ...state,
+        rows: state.rows.filter((note) => note.id !== action.payload),
+      });
+    },
+    archiveNote: (state, action) => {
+      state.rows.forEach((note) => {
+        if (note.id === action.payload) {
+          note.archived = true;
+        }
+      });
+    },
+    unarchiveNote: (state, action) => {
+      state.rows.forEach((note) => {
+        if (note.id === action.payload) {
+          note.archived = false;
+        }
+      });
+    },
+    editNote: (state, action) => {
+      const {
+        id,
+        values: { inputName, selectCategory, inputContent },
+      } = action.payload;
+      state.rows.forEach((note) => {
+        if (note.id === id) {
+          note.name = inputName;
+          note.category = selectCategory;
+          note.content = inputContent;
+          note.dates = getDatesTextFromContent(inputContent);
+        }
+      });
+    },
+    setEditNote: (state, action) => {
+      Object.assign(state, {
+        editNote: action.payload
+          ? state.rows.filter((note) => note.id === action.payload)[0]
+          : undefined,
+      });
+    },
   },
 });
 
-export const { initNotes, addNote } = notesSlice.actions;
+export const {
+  initNotes,
+  addNote,
+  deleteNote,
+  archiveNote,
+  unarchiveNote,
+  setEditNote,
+  editNote,
+} = notesSlice.actions;
 
 export const selectNotes = (state) => state.notes;
+export const selectEditNotes = (state) => state.notes.editNote;
 
 export default notesSlice.reducer;

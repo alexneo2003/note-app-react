@@ -1,21 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { addNote } from '../../redux/notesSlice';
+import {
+  addNote,
+  editNote,
+  selectEditNotes,
+  setEditNote,
+} from '../../redux/notesSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useInputChange } from './useInputChange';
 
-const NewNoteForm = ({ setIsShowingAddNewNote }) => {
+const NewNoteForm = ({ setIsShowingAddNewNote, title }) => {
   const dispatch = useDispatch();
+  const editNoteItem = useSelector(selectEditNotes);
 
   const [values, handleInputChange] = useInputChange({
-    inputName: '',
-    selectCategory: 'Idea',
-    inputContent:
-      'I’m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021',
+    inputName: editNoteItem ? editNoteItem.name : '',
+    selectCategory: editNoteItem ? editNoteItem.category : 'Idea',
+    inputContent: editNoteItem
+      ? editNoteItem.content
+      : 'I’m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021',
   });
 
   const onSubmitListener = (e) => {
     e.preventDefault();
-    dispatch(addNote(values));
+    editNoteItem
+      ? dispatch(editNote({ id: editNoteItem.id, values }))
+      : dispatch(addNote(values));
+    dispatch(setEditNote());
+    setIsShowingAddNewNote(false);
+  };
+
+  const onCloseClick = () => {
+    dispatch(setEditNote());
     setIsShowingAddNewNote(false);
   };
 
@@ -23,11 +38,8 @@ const NewNoteForm = ({ setIsShowingAddNewNote }) => {
 
   return (
     <div>
-      <h2>Add New Note</h2>
-      <button
-        className="modal-close modal-exit"
-        onClick={() => setIsShowingAddNewNote(false)}
-      >
+      <h2>{title}</h2>
+      <button className="modal-close modal-exit" onClick={() => onCloseClick()}>
         X
       </button>
       <form id="add-note-form" onSubmit={onSubmitListener}>
