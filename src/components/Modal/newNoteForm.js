@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   addNote,
   editNote,
@@ -8,7 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useInputChange } from './useInputChange';
 
-const NewNoteForm = ({ setIsShowingAddNewNote, title }) => {
+const NewNoteForm = ({ setIsShowing, title }) => {
   const dispatch = useDispatch();
   const editNoteItem = useSelector(selectEditNotes);
 
@@ -26,12 +26,12 @@ const NewNoteForm = ({ setIsShowingAddNewNote, title }) => {
       ? dispatch(editNote({ id: editNoteItem.id, values }))
       : dispatch(addNote(values));
     dispatch(setEditNote());
-    setIsShowingAddNewNote(false);
+    setIsShowing(false);
   };
 
   const onCloseClick = () => {
     dispatch(setEditNote());
-    setIsShowingAddNewNote(false);
+    setIsShowing(false);
   };
 
   const categories = ['Task', 'Random Thought', 'Idea', 'Quote'];

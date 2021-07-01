@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
 import './App.scss';
 import Table from './components/Table';
+import StatsTable from './components/Table/StatsTable';
 import Modal from './components/Modal';
-import NewNoteForm from './components/Modal/newNoteForm';
+import NewNoteForm from './components/Modal/NewNoteForm';
 import { notes } from './notes';
 import { initNotes, selectNotes } from './redux/notesSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import ArchivedTable from './components/Table/ArchivedTable';
 
 function App() {
   const [isShowingAddNewNote, setIsShowingAddNewNote] = useState(false);
+  const [isShowingArchivedNotes, setIsShowingArchivedNotes] = useState(false);
   const [modalTitle, setModalTitle] = useState('Add New Note');
   const dispatch = useDispatch();
 
@@ -34,10 +35,21 @@ function App() {
           Create Note
         </button>
       </div>
-      {/* <Table /> */}
+      {notesState.rows && (
+        <StatsTable
+          data={notesState}
+          setIsShowing={setIsShowingArchivedNotes}
+          setModalTitle={setModalTitle}
+        />
+      )}
       {isShowingAddNewNote && (
-        <Modal setIsShowingAddNewNote={setIsShowingAddNewNote}>
+        <Modal setIsShowing={setIsShowingAddNewNote}>
           <NewNoteForm title={modalTitle} />
+        </Modal>
+      )}
+      {isShowingArchivedNotes && (
+        <Modal setIsShowing={setIsShowingArchivedNotes}>
+          <ArchivedTable data={notesState} title="Archived Notes" />
         </Modal>
       )}
     </div>
